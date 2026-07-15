@@ -11,7 +11,8 @@
     "directory": "packages/eslint-config"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   },
   "main": "index.js",
   "files": [
