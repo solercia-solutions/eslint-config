@@ -4,6 +4,13 @@ Todos los cambios notables de este paquete se documentan en este archivo. El for
 [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado es
 [SemVer](https://semver.org/lang/es/).
 
+## [0.1.1] - 2026-07-15
+
+### Notas
+
+- Release en lockstep con `@solercia/ui@0.1.1` (el workflow publica ambos paquetes por tag `v*`). Sin
+  cambios funcionales en el preset respecto a `0.1.0`.
+
 ## [0.1.0] - 2026-07-14
 
 ### Agregado

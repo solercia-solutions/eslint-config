@@ -1,6 +1,6 @@
 {
   "name": "@solercia/eslint-config",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Preset ESLint compartible (flat config) del ecosistema Solercia: fronteras FSD, regla smart/dumb de shared/ui, restricción de Chart.js y convenciones de nombres (naming-convention + filename-case).",
   "license": "Apache-2.0",
