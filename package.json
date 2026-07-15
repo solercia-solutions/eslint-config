@@ -7,7 +7,7 @@
   "author": "Solercia Solutions SAS",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/camilocalderont/boki-front.git",
+    "url": "git+https://github.com/solercia-solutions/boki-front.git",
     "directory": "packages/eslint-config"
   },
   "publishConfig": {
