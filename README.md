@@ -20,9 +20,13 @@ en vez de clonarlas.
 
 ## Estado de distribución
 
-Hoy es un paquete **local, sin publicar** (`"private": true`). `boki-front` NO declara
-`workspaces` en su `package.json` raíz, así que en vez de instalarlo como dependencia de npm,
-se referencia por **ruta relativa** desde `eslint.config.js`:
+Hoy es un paquete **preparado para publicar, aún sin publicar realmente** (metadata de
+publicación lista: licencia `Apache-2.0`, `NOTICE`, `publishConfig` hacia GitHub Packages,
+`npm publish --dry-run` verificado — ver `openspec/07-e9-extraccion-solercia-ui/tasks.md`,
+PR4). La publicación real está bloqueada por la decisión D1 del fundador (owner/organización
+del scope `@solercia`, repositorio de alojamiento y método de autenticación). Mientras tanto,
+`boki-front` NO declara `workspaces` en su `package.json` raíz, así que en vez de instalarlo
+como dependencia de npm, se referencia por **ruta relativa** desde `eslint.config.js`:
 
 ```js
 import solerciaConfig from './packages/eslint-config/index.js';
@@ -48,3 +52,7 @@ import { solerciaEslintConfig } from './packages/eslint-config/index.js';
 
 export default [...solerciaEslintConfig({ srcDir: 'apps/web/src' })];
 ```
+
+## Licencia
+
+`Apache-2.0` © 2026 Solercia Solutions SAS. Ver [`LICENSE`](./LICENSE) y [`NOTICE`](./NOTICE).

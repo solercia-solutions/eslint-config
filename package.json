@@ -1,10 +1,26 @@
 {
   "name": "@solercia/eslint-config",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "description": "Preset ESLint compartible (flat config) del ecosistema Solercia: fronteras FSD, regla smart/dumb de shared/ui, restricción de Chart.js y convenciones de nombres (naming-convention + filename-case).",
+  "license": "Apache-2.0",
+  "author": "Solercia Solutions SAS",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/camilocalderont/boki-front.git",
+    "directory": "packages/eslint-config"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "main": "index.js",
+  "files": [
+    "index.js",
+    "LICENSE",
+    "NOTICE",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "exports": {
     ".": "./index.js"
   },
