@@ -98,6 +98,19 @@ const CHART_ENGINE_PATTERNS = [
 ];
 
 /**
+ * `@angular/cdk` (DragDrop) SIEMPRE envuelto en `sol-kanban-*` de `@solercia/ui`
+ * — ninguna vista/feature/entity/widget de un consumidor lo importa directo
+ * (11-a-solercia-ui, PR5b/D1). El único lugar autorizado del ECOSISTEMA es el
+ * árbol fuente de la propia librería (`projects/solercia/ui/src/lib/ui/kanban/`
+ * en boki-front), que este preset compartido no cubre (fuera de `src/**`) — se
+ * exime aparte en el `eslint.config.js` de boki-front.
+ */
+const CDK_PATTERNS = [
+  { group: ['@angular/cdk', '@angular/cdk/*'],
+    message: '@angular/cdk se importa ÚNICAMENTE dentro de sol-kanban-* (@solercia/ui). Las vistas usan <sol-kanban-board>/<sol-kanban-column>/<sol-kanban-card>.' },
+];
+
+/**
  * Regla smart/dumb (CONVENCIONES-FRONT-SOLERCIA.md §4): `shared/ui` contiene
  * SOLO componentes tontos (presentacionales) — no puede inyectar stores,
  * facades ni conocer dominio. Se aplica ADEMÁS de las fronteras de alias
@@ -178,6 +191,7 @@ export function solerciaEslintConfig(options = {}) {
               message: 'shared/ NO puede importar de capas superiores ni de @app/* (bootstrap)' },
             ...DEEP_IMPORT_PATTERNS,
             ...CHART_ENGINE_PATTERNS,
+            ...CDK_PATTERNS,
           ],
         }],
       },
@@ -195,6 +209,7 @@ export function solerciaEslintConfig(options = {}) {
               message: 'shared/ NO puede importar de capas superiores ni de @app/* (bootstrap)' },
             ...DEEP_IMPORT_PATTERNS,
             ...CHART_ENGINE_PATTERNS,
+            ...CDK_PATTERNS,
             ...SMART_DUMB_PATTERNS,
           ],
         }],
@@ -212,6 +227,7 @@ export function solerciaEslintConfig(options = {}) {
             { group: ['@pages/*', '@widgets/*', '@features/*', '@entities/*', '@app/*'],
               message: 'shared/ NO puede importar de capas superiores ni de @app/* (bootstrap)' },
             ...DEEP_IMPORT_PATTERNS,
+            ...CDK_PATTERNS,
             ...SMART_DUMB_PATTERNS,
           ],
         }],
@@ -228,6 +244,7 @@ export function solerciaEslintConfig(options = {}) {
               message: 'entities/ solo puede importar de @shared/*. NO puede importar de @app/* (bootstrap)' },
             ...DEEP_IMPORT_PATTERNS,
             ...CHART_ENGINE_PATTERNS,
+            ...CDK_PATTERNS,
           ],
         }],
       },
@@ -243,6 +260,7 @@ export function solerciaEslintConfig(options = {}) {
               message: 'features/ solo puede importar de @entities/* y @shared/*. NO puede importar de @app/* (bootstrap)' },
             ...DEEP_IMPORT_PATTERNS,
             ...CHART_ENGINE_PATTERNS,
+            ...CDK_PATTERNS,
           ],
         }],
       },
@@ -258,6 +276,7 @@ export function solerciaEslintConfig(options = {}) {
               message: 'widgets/ NO puede importar de @pages/* ni de @app/* (bootstrap)' },
             ...DEEP_IMPORT_PATTERNS,
             ...CHART_ENGINE_PATTERNS,
+            ...CDK_PATTERNS,
           ],
         }],
       },
@@ -273,6 +292,7 @@ export function solerciaEslintConfig(options = {}) {
               message: 'pages/ NO puede importar de @app/* (bootstrap). Usa @widgets/@features/@entities/@shared.' },
             ...DEEP_IMPORT_PATTERNS,
             ...CHART_ENGINE_PATTERNS,
+            ...CDK_PATTERNS,
           ],
         }],
       },
@@ -284,7 +304,7 @@ export function solerciaEslintConfig(options = {}) {
     {
       files: [`${src}/app/**/*.ts`],
       rules: {
-        'no-restricted-imports': ['error', { patterns: [...DEEP_IMPORT_PATTERNS, ...CHART_ENGINE_PATTERNS] }],
+        'no-restricted-imports': ['error', { patterns: [...DEEP_IMPORT_PATTERNS, ...CHART_ENGINE_PATTERNS, ...CDK_PATTERNS] }],
       },
     },
   ];
