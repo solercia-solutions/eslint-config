@@ -10,6 +10,8 @@
  *   2. La regla smart/dumb de `shared/ui`: prohíbe importar stores/facades/dominio
  *      (`**\/entities/**`, `**\/features/**`, patrones `*.store`/`*.facade`).
  *   3. La restricción de Chart.js: prohíbe `chart.js` fuera de `shared/ui/chart`.
+ *      Igual con MapLibre: `maplibre-gl` solo dentro de `shared/ui/map`
+ *      (también sus `import()` dinámicos).
  *   4. Convenciones de nombres: `@typescript-eslint/naming-convention` (símbolos
  *      tipo/variable/función/parámetro) + `filename-case` propio (kebab-case).
  *
@@ -95,6 +97,13 @@ const DEEP_IMPORT_PATTERNS = [
 const CHART_ENGINE_PATTERNS = [
   { group: ['chart.js', 'chart.js/*'],
     message: 'Chart.js solo se importa dentro de shared/ui/chart (sol-chart). Las vistas usan <sol-chart>.' },
+];
+
+/** MapLibre GL SIEMPRE envuelto en sol-map (carga diferida, tokens claro y oscuro). */
+const MAP_ENGINE_MESSAGE =
+  'maplibre-gl solo se importa dentro de shared/ui/map (sol-map). Las vistas usan <sol-map>.';
+const MAP_ENGINE_PATTERNS = [
+  { group: ['maplibre-gl', 'maplibre-gl/*', '@maplibre/*'], message: MAP_ENGINE_MESSAGE },
 ];
 
 /**
@@ -191,6 +200,7 @@ export function solerciaEslintConfig(options = {}) {
               message: 'shared/ NO puede importar de capas superiores ni de @app/* (bootstrap)' },
             ...DEEP_IMPORT_PATTERNS,
             ...CHART_ENGINE_PATTERNS,
+            ...MAP_ENGINE_PATTERNS,
             ...CDK_PATTERNS,
           ],
         }],
@@ -209,6 +219,7 @@ export function solerciaEslintConfig(options = {}) {
               message: 'shared/ NO puede importar de capas superiores ni de @app/* (bootstrap)' },
             ...DEEP_IMPORT_PATTERNS,
             ...CHART_ENGINE_PATTERNS,
+            ...MAP_ENGINE_PATTERNS,
             ...CDK_PATTERNS,
             ...SMART_DUMB_PATTERNS,
           ],
@@ -227,9 +238,40 @@ export function solerciaEslintConfig(options = {}) {
             { group: ['@pages/*', '@widgets/*', '@features/*', '@entities/*', '@app/*'],
               message: 'shared/ NO puede importar de capas superiores ni de @app/* (bootstrap)' },
             ...DEEP_IMPORT_PATTERNS,
+            ...MAP_ENGINE_PATTERNS,
             ...CDK_PATTERNS,
             ...SMART_DUMB_PATTERNS,
           ],
+        }],
+      },
+    },
+    // ── Exención MapLibre: shared/ui/map (sol-map) es el ÚNICO lugar
+    // autorizado para importar maplibre-gl. Mismo criterio que Chart.js:
+    // mantiene smart/dumb y va después del bloque de shared/ui para ganar.
+    {
+      files: [`${src}/shared/ui/map/**/*.ts`],
+      rules: {
+        'no-restricted-imports': ['error', {
+          patterns: [
+            { group: ['@pages/*', '@widgets/*', '@features/*', '@entities/*', '@app/*'],
+              message: 'shared/ NO puede importar de capas superiores ni de @app/* (bootstrap)' },
+            ...DEEP_IMPORT_PATTERNS,
+            ...CHART_ENGINE_PATTERNS,
+            ...CDK_PATTERNS,
+            ...SMART_DUMB_PATTERNS,
+          ],
+        }],
+      },
+    },
+    // `no-restricted-imports` no ve los `import()` dinámicos: sol-map carga
+    // MapLibre de forma diferida y nadie más debe poder hacerlo.
+    {
+      files: [`${src}/**/*.ts`],
+      ignores: [`${src}/shared/ui/map/**`],
+      rules: {
+        'no-restricted-syntax': ['error', {
+          selector: "ImportExpression[source.value=/^maplibre-gl/]",
+          message: MAP_ENGINE_MESSAGE,
         }],
       },
     },
@@ -244,6 +286,7 @@ export function solerciaEslintConfig(options = {}) {
               message: 'entities/ solo puede importar de @shared/*. NO puede importar de @app/* (bootstrap)' },
             ...DEEP_IMPORT_PATTERNS,
             ...CHART_ENGINE_PATTERNS,
+            ...MAP_ENGINE_PATTERNS,
             ...CDK_PATTERNS,
           ],
         }],
@@ -260,6 +303,7 @@ export function solerciaEslintConfig(options = {}) {
               message: 'features/ solo puede importar de @entities/* y @shared/*. NO puede importar de @app/* (bootstrap)' },
             ...DEEP_IMPORT_PATTERNS,
             ...CHART_ENGINE_PATTERNS,
+            ...MAP_ENGINE_PATTERNS,
             ...CDK_PATTERNS,
           ],
         }],
@@ -276,6 +320,7 @@ export function solerciaEslintConfig(options = {}) {
               message: 'widgets/ NO puede importar de @pages/* ni de @app/* (bootstrap)' },
             ...DEEP_IMPORT_PATTERNS,
             ...CHART_ENGINE_PATTERNS,
+            ...MAP_ENGINE_PATTERNS,
             ...CDK_PATTERNS,
           ],
         }],
@@ -292,6 +337,7 @@ export function solerciaEslintConfig(options = {}) {
               message: 'pages/ NO puede importar de @app/* (bootstrap). Usa @widgets/@features/@entities/@shared.' },
             ...DEEP_IMPORT_PATTERNS,
             ...CHART_ENGINE_PATTERNS,
+            ...MAP_ENGINE_PATTERNS,
             ...CDK_PATTERNS,
           ],
         }],
@@ -304,7 +350,7 @@ export function solerciaEslintConfig(options = {}) {
     {
       files: [`${src}/app/**/*.ts`],
       rules: {
-        'no-restricted-imports': ['error', { patterns: [...DEEP_IMPORT_PATTERNS, ...CHART_ENGINE_PATTERNS, ...CDK_PATTERNS] }],
+        'no-restricted-imports': ['error', { patterns: [...DEEP_IMPORT_PATTERNS, ...CHART_ENGINE_PATTERNS, ...MAP_ENGINE_PATTERNS, ...CDK_PATTERNS] }],
       },
     },
   ];

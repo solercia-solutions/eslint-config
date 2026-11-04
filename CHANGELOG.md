@@ -4,6 +4,14 @@ Todos los cambios notables de este paquete se documentan en este archivo. El for
 [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado es
 [SemVer](https://semver.org/lang/es/).
 
+## [Sin publicar]
+
+### Agregado
+
+- Restricción de MapLibre GL con el mismo criterio que Chart.js: `maplibre-gl` solo se importa
+  dentro de `shared/ui/map` (`sol-map`). Una regla `no-restricted-syntax` cubre además los
+  `import()` dinámicos, que `no-restricted-imports` no ve.
+
 ## [0.1.1] - 2026-07-15
 
 ### Notas

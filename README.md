@@ -12,7 +12,8 @@ en vez de clonarlas.
 2. **Regla smart/dumb** de `shared/ui`: prohíbe importar stores/facades/dominio
    (`**/entities/**`, `**/features/**`, patrones `*.store`/`*.facade`).
 3. **Restricción de Chart.js**: prohíbe `chart.js` fuera de `shared/ui/chart` (las vistas usan
-   `<sol-chart>`).
+   `<sol-chart>`). Igual con MapLibre: `maplibre-gl` solo dentro de `shared/ui/map` (las vistas
+   usan `<sol-map>`), incluidos sus `import()` dinámicos.
 4. **Convenciones de nombres**: `@typescript-eslint/naming-convention` (clases/interfaces/tipos
    en PascalCase, variables/funciones/parámetros en camelCase) + `filename-case` propio
    (kebab-case de archivos). Implementado in-house (sin `eslint-plugin-unicorn`) siguiendo la
