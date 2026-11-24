@@ -1,8 +1,8 @@
 {
   "name": "@solercia/eslint-config",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "type": "module",
-  "description": "Preset ESLint compartible (flat config) del ecosistema Solercia: fronteras FSD, regla smart/dumb de shared/ui, restricción de Chart.js y convenciones de nombres (naming-convention + filename-case).",
+  "description": "Preset ESLint compartible (flat config) del ecosistema Solercia: fronteras FSD, ubicación de archivos por capa y segmento, estilos con variables del tema (inline y .css), regla smart/dumb de shared/ui, restricción de Chart.js y convenciones de nombres.",
   "license": "Apache-2.0",
   "author": "Solercia Solutions SAS",
   "repository": {
@@ -17,6 +17,7 @@
   "main": "index.js",
   "files": [
     "index.js",
+    "lib",
     "LICENSE",
     "NOTICE",
     "README.md",
@@ -27,6 +28,12 @@
   },
   "peerDependencies": {
     "eslint": "^10.0.0",
-    "typescript-eslint": "^8.0.0"
+    "typescript-eslint": "^8.0.0",
+    "@eslint/css": "^2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@eslint/css": {
+      "optional": true
+    }
   }
 }

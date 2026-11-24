@@ -29,6 +29,17 @@
  *   export default [...solerciaEslintConfig({ srcDir: 'apps/web/src' })];
  */
 import tseslint from 'typescript-eslint';
+import {
+  styleTokensRule,
+  cssStyleTokensRule,
+  fsdPlacementRule,
+  DEFAULT_SHARED_SEGMENTS,
+  DEFAULT_OUTSIDE_LAYERS,
+} from './lib/rules.js';
+
+// `@eslint/css` is an optional peer: with it installed, .css files get the
+// same style checks as inline component styles; without it they are skipped.
+const cssPlugin = await import('@eslint/css').then((module) => module.default).catch(() => null);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Plugin propio, in-house: regla `filename-case` (kebab-case). Se implementa
@@ -78,6 +89,16 @@ const solerciaNamingPlugin = {
         };
       },
     },
+  },
+};
+
+/** Plugin `solercia`: naming plus the style and placement rules (0.2.0, see lib/rules.js). */
+const solerciaPlugin = {
+  rules: {
+    ...solerciaNamingPlugin.rules,
+    'style-tokens': styleTokensRule,
+    'css-style-tokens': cssStyleTokensRule,
+    'fsd-placement': fsdPlacementRule,
   },
 };
 
@@ -137,15 +158,24 @@ const SMART_DUMB_PATTERNS = [
 /**
  * Construye el preset ESLint compartible del ecosistema Solercia.
  *
- * @param {{ srcDir?: string }} [options]
+ * @param {{ srcDir?: string, extraSharedSegments?: string[], allowOutsideLayers?: string[] }} [options]
  *   - srcDir: raíz FSD del proyecto consumidor (default: 'src'). Los alias
  *     (`@app`, `@pages`, `@widgets`, `@features`, `@entities`, `@shared`) son
  *     convención fija del ecosistema (CONVENCIONES-FRONT-SOLERCIA.md) y NO se
  *     parametrizan; lo único variable entre consumidores es la carpeta física.
+ *   - extraSharedSegments: segmentos de `shared/` propios del proyecto, además
+ *     de los del ecosistema (`fsd-placement`).
+ *   - allowOutsideLayers: archivos de arranque fuera de las capas, relativos a
+ *     srcDir (`main.ts`, `environments/**`); reemplaza la lista por defecto.
  * @returns {import('eslint').Linter.Config[]}
  */
 export function solerciaEslintConfig(options = {}) {
   const src = (options.srcDir ?? 'src').replace(/\/+$/, '');
+  const placementOptions = {
+    srcDir: src,
+    sharedSegments: [...DEFAULT_SHARED_SEGMENTS, ...(options.extraSharedSegments ?? [])],
+    allowOutsideLayers: options.allowOutsideLayers ?? DEFAULT_OUTSIDE_LAYERS,
+  };
 
   return [
     // Wiring mínimo del parser TypeScript + registro del plugin
@@ -159,7 +189,7 @@ export function solerciaEslintConfig(options = {}) {
       },
       plugins: {
         '@typescript-eslint': tseslint.plugin,
-        solercia: solerciaNamingPlugin,
+        solercia: solerciaPlugin,
       },
       rules: {
         '@typescript-eslint/naming-convention': [
@@ -186,8 +216,21 @@ export function solerciaEslintConfig(options = {}) {
           },
         ],
         'solercia/filename-case': 'error',
+        'solercia/style-tokens': 'error',
+        'solercia/fsd-placement': ['error', placementOptions],
       },
     },
+
+    // ── Estilos en archivos .css (solo si @eslint/css está instalado) ──────
+    ...(cssPlugin
+      ? [{
+          files: [`${src}/**/*.css`],
+          language: 'css/css',
+          languageOptions: { tolerant: true },
+          plugins: { css: cssPlugin, solercia: solerciaPlugin },
+          rules: { 'solercia/css-style-tokens': 'error' },
+        }]
+      : []),
 
     // ── Frontera: shared/** ────────────────────────────────────────────────
     // shared/ NO importa de capas superiores ni de @app/* (bootstrap).
