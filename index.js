@@ -1,30 +1,30 @@
 // @ts-check
 /**
- * @solercia/eslint-config — preset ESLint compartible (flat config, ESLint 10) del
- * ecosistema Solercia.
+ * @solercia/eslint-config — shareable ESLint preset (flat config, ESLint 10) of the
+ * Solercia ecosystem.
  *
- * Encapsula:
- *   1. Las fronteras FSD por capa (`no-restricted-imports`):
+ * It bundles:
+ *   1. The FSD boundaries per layer (`no-restricted-imports`):
  *      app → pages → widgets → features → entities → shared
- *   2. La regla smart/dumb de `shared/ui`: prohíbe importar stores/facades/dominio
- *      (`**\/entities/**`, `**\/features/**`, patrones `*.store`/`*.facade`).
- *   3. La restricción de Chart.js: prohíbe `chart.js` fuera de `shared/ui/chart`.
- *      Igual con MapLibre: `maplibre-gl` solo dentro de `shared/ui/map`
- *      (también sus `import()` dinámicos).
- *   4. Convenciones de nombres: `@typescript-eslint/naming-convention` (símbolos
- *      tipo/variable/función/parámetro) + `filename-case` propio (kebab-case).
- *   5. Estilos con variables del tema y ubicación de archivos por capa y
- *      segmento (`lib/rules.js`, desde 0.2.0).
+ *   2. The smart/dumb rule of `shared/ui`: forbids importing stores, facades and
+ *      domain code (`**\/entities/**`, `**\/features/**`, `*.store`/`*.facade` patterns).
+ *   3. The Chart.js restriction: forbids `chart.js` outside `shared/ui/chart`.
+ *      Same for MapLibre: `maplibre-gl` only inside `shared/ui/map`
+ *      (dynamic `import()` calls included).
+ *   4. Naming conventions: `@typescript-eslint/naming-convention` (type, variable,
+ *      function and parameter symbols) + an in-house `filename-case` (kebab-case).
+ *   5. Theme-variable styles and file placement by layer and segment
+ *      (`lib/rules.js`, since 0.2.0).
  *
- * Uso:
+ * Usage:
  *
  *   import solerciaConfig from '@solercia/eslint-config';
  *   export default [
  *     ...solerciaConfig,
- *     // reglas/overrides propios del proyecto consumidor
+ *     // the consuming project's own rules/overrides
  *   ];
  *
- * Parametrizable si el proyecto consumidor no usa `src/` como raíz FSD:
+ * Configurable when the consuming project does not use `src/` as its FSD root:
  *
  *   import { solerciaEslintConfig } from '@solercia/eslint-config';
  *   export default [...solerciaEslintConfig({ srcDir: 'apps/web/src' })];
@@ -43,10 +43,10 @@ import {
 const cssPlugin = await import('@eslint/css').then((module) => module.default).catch(() => null);
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Plugin propio, in-house: regla `filename-case` (kebab-case). Se implementa
-// local en vez de instalar `eslint-plugin-unicorn` completo (filosofía del
-// proyecto: in-house por defecto — ver CLAUDE.md raíz del monorepo — para no
-// arrastrar decenas de reglas ajenas por una sola que además es trivial).
+// In-house plugin: the `filename-case` rule (kebab-case). It is implemented
+// locally instead of installing the whole `eslint-plugin-unicorn` (the project
+// prefers in-house code by default) so that dozens of unrelated rules are not
+// pulled in for a single rule that is also trivial.
 // ─────────────────────────────────────────────────────────────────────────────
 const KEBAB_SEGMENT_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const IGNORED_BASENAMES = new Set(['index.ts', 'index.d.ts']);
@@ -57,12 +57,12 @@ const solerciaNamingPlugin = {
       meta: {
         type: 'problem',
         docs: {
-          description: 'Exige nombres de archivo en kebab-case (convención FSD Solercia, CONVENCIONES-FRONT-SOLERCIA.md §5).',
+          description: 'Requires kebab-case file names (Solercia FSD front-end convention).',
         },
         schema: [],
         messages: {
           notKebabCase:
-            'El archivo "{{basename}}" no sigue kebab-case (segmento inválido: "{{segment}}"). Usa minúsculas y guiones, ej. "appointment-form.component.ts".',
+            'The file "{{basename}}" is not kebab-case (invalid segment: "{{segment}}"). Use lowercase letters and hyphens, e.g. "appointment-form.component.ts".',
         },
       },
       create(context) {
@@ -72,9 +72,9 @@ const solerciaNamingPlugin = {
             const basename = filename.split(/[\\/]/).pop() ?? '';
             if (IGNORED_BASENAMES.has(basename)) return;
 
-            // Quita SOLO la extensión final (.ts/.tsx/.mts/.cts) — el resto de
-            // segmentos separados por "." (ej. "button.component.spec") se
-            // validan uno por uno, porque cada uno debe ser kebab-case.
+            // Strip ONLY the final extension (.ts/.tsx/.mts/.cts) — the remaining
+            // "."-separated segments (e.g. "button.component.spec") are validated
+            // one by one, because each of them must be kebab-case.
             const withoutExt = basename.replace(/\.[cm]?tsx?$/, '');
             const segments = withoutExt.split('.').filter(Boolean);
             const badSegment = segments.find((segment) => !KEBAB_SEGMENT_RE.test(segment));
@@ -104,69 +104,69 @@ const solerciaPlugin = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Fronteras FSD — patrones compartidos por todas las capas.
+// FSD boundaries — patterns shared by every layer.
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Prohíbe deep-imports a slices internos de otra capa: solo la public API (index.ts). */
+/** Forbids deep imports into the internal slices of another layer: only the public API (index.ts). */
 const DEEP_IMPORT_PATTERNS = [
-  { group: ['@pages/*/*/*'], message: 'Importa solo desde la public API: @pages/nombre' },
-  { group: ['@widgets/*/*/*'], message: 'Importa solo desde la public API: @widgets/nombre' },
-  { group: ['@features/*/*/*'], message: 'Importa solo desde la public API: @features/nombre' },
-  { group: ['@entities/*/*/*'], message: 'Importa solo desde la public API: @entities/nombre' },
+  { group: ['@pages/*/*/*'], message: 'Import only from the public API: @pages/<name>' },
+  { group: ['@widgets/*/*/*'], message: 'Import only from the public API: @widgets/<name>' },
+  { group: ['@features/*/*/*'], message: 'Import only from the public API: @features/<name>' },
+  { group: ['@entities/*/*/*'], message: 'Import only from the public API: @entities/<name>' },
 ];
 
-/** Chart.js SIEMPRE envuelto en sol-chart — ninguna vista/feature/entity lo importa directo. */
+/** Chart.js is ALWAYS wrapped by sol-chart — no view/feature/entity imports it directly. */
 const CHART_ENGINE_PATTERNS = [
   { group: ['chart.js', 'chart.js/*'],
-    message: 'Chart.js solo se importa dentro de shared/ui/chart (sol-chart). Las vistas usan <sol-chart>.' },
+    message: 'Import chart.js only inside shared/ui/chart (sol-chart). Views use <sol-chart>.' },
 ];
 
-/** MapLibre GL SIEMPRE envuelto en sol-map (carga diferida, tokens claro y oscuro). */
+/** MapLibre GL is ALWAYS wrapped by sol-map (lazy loading, light and dark tokens). */
 const MAP_ENGINE_MESSAGE =
-  'maplibre-gl solo se importa dentro de shared/ui/map (sol-map). Las vistas usan <sol-map>.';
+  'Import maplibre-gl only inside shared/ui/map (sol-map). Views use <sol-map>.';
 const MAP_ENGINE_PATTERNS = [
   { group: ['maplibre-gl', 'maplibre-gl/*', '@maplibre/*'], message: MAP_ENGINE_MESSAGE },
 ];
 
 /**
- * `@angular/cdk` (DragDrop) SIEMPRE envuelto en `sol-kanban-*` de `@solercia/ui`
- * — ninguna vista/feature/entity/widget de un consumidor lo importa directo
- * (11-a-solercia-ui, PR5b/D1). El único lugar autorizado del ECOSISTEMA es el
- * árbol fuente de la propia librería (`projects/solercia/ui/src/lib/ui/kanban/`
- * en el repositorio solercia-ui), que este preset no cubre (fuera de `src/**`).
+ * `@angular/cdk` (DragDrop) is ALWAYS wrapped by the `sol-kanban-*` components
+ * of `@solercia/ui` — no view/feature/entity/widget of a consumer imports it
+ * directly. The only place allowed in the whole ecosystem is the source tree of
+ * the library itself (`projects/solercia/ui/src/lib/ui/kanban/` in the
+ * @solercia/ui sources), which this preset does not cover (it is outside `src/**`).
  */
 const CDK_PATTERNS = [
   { group: ['@angular/cdk', '@angular/cdk/*'],
-    message: '@angular/cdk se importa ÚNICAMENTE dentro de sol-kanban-* (@solercia/ui). Las vistas usan <sol-kanban-board>/<sol-kanban-column>/<sol-kanban-card>.' },
+    message: 'Import @angular/cdk ONLY inside sol-kanban-* (@solercia/ui). Views use <sol-kanban-board>/<sol-kanban-column>/<sol-kanban-card>.' },
 ];
 
 /**
- * Regla smart/dumb (CONVENCIONES-FRONT-SOLERCIA.md §4): `shared/ui` contiene
- * SOLO componentes tontos (presentacionales) — no puede inyectar stores,
- * facades ni conocer dominio. Se aplica ADEMÁS de las fronteras de alias
- * (`@entities/*`, `@features/*`) para atrapar también deep-imports relativos
- * que las esquiven (`../../entities/x`) y el patrón de nombre de archivo
- * `*.store` / `*.facade` sin importar la ruta.
+ * Smart/dumb rule (Solercia front-end conventions): `shared/ui` contains ONLY
+ * dumb (presentational) components — it cannot inject stores or facades, nor
+ * know the domain. It applies IN ADDITION to the alias boundaries
+ * (`@entities/*`, `@features/*`) so it also catches relative deep imports that
+ * sidestep them (`../../entities/x`) and the `*.store` / `*.facade` file-name
+ * pattern regardless of the path.
  */
 const SMART_DUMB_PATTERNS = [
   { group: ['**/entities/**', '**/features/**'],
-    message: 'shared/ui es de componentes tontos (presentacionales): no puede importar de entities/ ni features/ (ni siquiera por ruta relativa).' },
+    message: 'shared/ui holds dumb (presentational) components: it cannot import from entities/ or features/ (not even through a relative path).' },
   { regex: '\\.(store|facade)$',
-    message: 'shared/ui no puede importar stores ni facades — mantiene los componentes sin lógica de dominio.' },
+    message: 'shared/ui cannot import stores or facades — keep components free of domain logic.' },
 ];
 
 /**
- * Construye el preset ESLint compartible del ecosistema Solercia.
+ * Builds the shareable ESLint preset of the Solercia ecosystem.
  *
  * @param {{ srcDir?: string, extraSharedSegments?: string[], allowOutsideLayers?: string[] }} [options]
- *   - srcDir: raíz FSD del proyecto consumidor (default: 'src'). Los alias
- *     (`@app`, `@pages`, `@widgets`, `@features`, `@entities`, `@shared`) son
- *     convención fija del ecosistema (CONVENCIONES-FRONT-SOLERCIA.md) y NO se
- *     parametrizan; lo único variable entre consumidores es la carpeta física.
- *   - extraSharedSegments: segmentos de `shared/` propios del proyecto, además
- *     de los del ecosistema (`fsd-placement`).
- *   - allowOutsideLayers: archivos de arranque fuera de las capas, relativos a
- *     srcDir (`main.ts`, `environments/**`); reemplaza la lista por defecto.
+ *   - srcDir: FSD root of the consuming project (default: 'src'). The aliases
+ *     (`@app`, `@pages`, `@widgets`, `@features`, `@entities`, `@shared`) are a
+ *     fixed convention of the ecosystem and are NOT configurable; the only thing
+ *     that varies between consumers is the physical folder.
+ *   - extraSharedSegments: project-specific `shared/` segments, in addition to
+ *     the ecosystem ones (`fsd-placement`).
+ *   - allowOutsideLayers: bootstrap files outside the layers, relative to
+ *     srcDir (`main.ts`, `environments/**`); replaces the default list.
  * @returns {import('eslint').Linter.Config[]}
  */
 export function solerciaEslintConfig(options = {}) {
@@ -178,10 +178,10 @@ export function solerciaEslintConfig(options = {}) {
   };
 
   return [
-    // Wiring mínimo del parser TypeScript + registro del plugin
-    // @typescript-eslint (requerido por `naming-convention`, más abajo).
-    // Alcance deliberadamente sin type-checking (sin `parserOptions.project`):
-    // las reglas del preset son sintácticas, no requieren info de tipos.
+    // Minimal wiring of the TypeScript parser + registration of the
+    // @typescript-eslint plugin (required by `naming-convention`, below).
+    // Deliberately scoped without type-checking (no `parserOptions.project`):
+    // the preset rules are syntactic and do not need type information.
     {
       files: [`${src}/**/*.ts`],
       languageOptions: {
@@ -197,12 +197,13 @@ export function solerciaEslintConfig(options = {}) {
           { selector: 'typeLike', format: ['PascalCase'] },
           { selector: 'enumMember', format: ['PascalCase', 'UPPER_CASE'] },
           {
-            // PascalCase permitido ADEMÁS de camelCase/UPPER_CASE: el back
-            // (.NET) nombra sus campos en PascalCase (`VcName`, `CompanyId`,
-            // `Id`) y el front los espeja tal cual en destructuring y en
-            // parámetros de fixtures de test (`const { CompanyId } = ...`,
-            // `const cat = (Id, VcName) => ({ Id, VcName })`) — no es un
-            // error de estilo, es el contrato del DTO. Ver *.model.ts.
+            // PascalCase is allowed IN ADDITION to camelCase/UPPER_CASE: the
+            // back end (.NET) names its fields in PascalCase (`VcName`,
+            // `CompanyId`, `Id`) and the front end mirrors them as-is in
+            // destructuring and in test fixture parameters
+            // (`const { CompanyId } = ...`,
+            // `const cat = (Id, VcName) => ({ Id, VcName })`) — it is not a
+            // style error, it is the DTO contract. See *.model.ts.
             selector: 'variable',
             format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
             leadingUnderscore: 'allow',
@@ -221,7 +222,7 @@ export function solerciaEslintConfig(options = {}) {
       },
     },
 
-    // ── Estilos en archivos .css (solo si @eslint/css está instalado) ──────
+    // ── Styles in .css files (only if @eslint/css is installed) ────────────
     ...(cssPlugin
       ? [{
           files: [`${src}/**/*.css`],
@@ -232,15 +233,15 @@ export function solerciaEslintConfig(options = {}) {
         }]
       : []),
 
-    // ── Frontera: shared/** ────────────────────────────────────────────────
-    // shared/ NO importa de capas superiores ni de @app/* (bootstrap).
+    // ── Boundary: shared/** ────────────────────────────────────────────────
+    // shared/ does NOT import from upper layers or from @app/* (bootstrap).
     {
       files: [`${src}/shared/**/*.ts`],
       rules: {
         'no-restricted-imports': ['error', {
           patterns: [
             { group: ['@pages/*', '@widgets/*', '@features/*', '@entities/*', '@app/*'],
-              message: 'shared/ NO puede importar de capas superiores ni de @app/* (bootstrap)' },
+              message: 'shared/ must NOT import from upper layers or from @app/* (bootstrap)' },
             ...DEEP_IMPORT_PATTERNS,
             ...CHART_ENGINE_PATTERNS,
             ...MAP_ENGINE_PATTERNS,
@@ -249,17 +250,17 @@ export function solerciaEslintConfig(options = {}) {
         }],
       },
     },
-    // ── shared/ui: además de la frontera anterior, regla smart/dumb ────────
-    // (bloque MÁS específico que el anterior — flat config: el último bloque
-    // que matchea un archivo gana por completo para un mismo ruleId, así que
-    // repetimos la frontera base y sumamos smart/dumb).
+    // ── shared/ui: on top of the previous boundary, the smart/dumb rule ────
+    // (a MORE specific block than the previous one — flat config: the last
+    // block that matches a file wins entirely for a given ruleId, so we
+    // repeat the base boundary and add smart/dumb).
     {
       files: [`${src}/shared/ui/**/*.ts`],
       rules: {
         'no-restricted-imports': ['error', {
           patterns: [
             { group: ['@pages/*', '@widgets/*', '@features/*', '@entities/*', '@app/*'],
-              message: 'shared/ NO puede importar de capas superiores ni de @app/* (bootstrap)' },
+              message: 'shared/ must NOT import from upper layers or from @app/* (bootstrap)' },
             ...DEEP_IMPORT_PATTERNS,
             ...CHART_ENGINE_PATTERNS,
             ...MAP_ENGINE_PATTERNS,
@@ -269,17 +270,17 @@ export function solerciaEslintConfig(options = {}) {
         }],
       },
     },
-    // ── Exención Chart.js: shared/ui/chart es el ÚNICO lugar autorizado para
-    // importar Chart.js. Mantiene smart/dumb (el wrapper tampoco inyecta
-    // dominio) pero sin el patrón de chart.js. Va DESPUÉS del bloque de
-    // shared/ui para ganar por completo en estos archivos.
+    // ── Chart.js exemption: shared/ui/chart is the ONLY place allowed to
+    // import Chart.js. It keeps smart/dumb (the wrapper does not inject domain
+    // code either) but without the chart.js pattern. It goes AFTER the
+    // shared/ui block so it wins entirely for these files.
     {
       files: [`${src}/shared/ui/chart/**/*.ts`],
       rules: {
         'no-restricted-imports': ['error', {
           patterns: [
             { group: ['@pages/*', '@widgets/*', '@features/*', '@entities/*', '@app/*'],
-              message: 'shared/ NO puede importar de capas superiores ni de @app/* (bootstrap)' },
+              message: 'shared/ must NOT import from upper layers or from @app/* (bootstrap)' },
             ...DEEP_IMPORT_PATTERNS,
             ...MAP_ENGINE_PATTERNS,
             ...CDK_PATTERNS,
@@ -288,16 +289,16 @@ export function solerciaEslintConfig(options = {}) {
         }],
       },
     },
-    // ── Exención MapLibre: shared/ui/map (sol-map) es el ÚNICO lugar
-    // autorizado para importar maplibre-gl. Mismo criterio que Chart.js:
-    // mantiene smart/dumb y va después del bloque de shared/ui para ganar.
+    // ── MapLibre exemption: shared/ui/map (sol-map) is the ONLY place
+    // allowed to import maplibre-gl. Same criterion as Chart.js: it keeps
+    // smart/dumb and goes after the shared/ui block so it wins.
     {
       files: [`${src}/shared/ui/map/**/*.ts`],
       rules: {
         'no-restricted-imports': ['error', {
           patterns: [
             { group: ['@pages/*', '@widgets/*', '@features/*', '@entities/*', '@app/*'],
-              message: 'shared/ NO puede importar de capas superiores ni de @app/* (bootstrap)' },
+              message: 'shared/ must NOT import from upper layers or from @app/* (bootstrap)' },
             ...DEEP_IMPORT_PATTERNS,
             ...CHART_ENGINE_PATTERNS,
             ...CDK_PATTERNS,
@@ -306,8 +307,8 @@ export function solerciaEslintConfig(options = {}) {
         }],
       },
     },
-    // `no-restricted-imports` no ve los `import()` dinámicos: sol-map carga
-    // MapLibre de forma diferida y nadie más debe poder hacerlo.
+    // `no-restricted-imports` does not see dynamic `import()` calls: sol-map
+    // loads MapLibre lazily and nobody else may do so.
     {
       files: [`${src}/**/*.ts`],
       ignores: [`${src}/shared/ui/map/**`],
@@ -319,14 +320,14 @@ export function solerciaEslintConfig(options = {}) {
       },
     },
 
-    // ── Frontera: entities/** ───────────────────────────────────────────────
+    // ── Boundary: entities/** ───────────────────────────────────────────────
     {
       files: [`${src}/entities/**/*.ts`],
       rules: {
         'no-restricted-imports': ['error', {
           patterns: [
             { group: ['@pages/*', '@widgets/*', '@features/*', '@app/*'],
-              message: 'entities/ solo puede importar de @shared/*. NO puede importar de @app/* (bootstrap)' },
+              message: 'entities/ may only import from @shared/*. It must NOT import from @app/* (bootstrap)' },
             ...DEEP_IMPORT_PATTERNS,
             ...CHART_ENGINE_PATTERNS,
             ...MAP_ENGINE_PATTERNS,
@@ -336,14 +337,14 @@ export function solerciaEslintConfig(options = {}) {
       },
     },
 
-    // ── Frontera: features/** ───────────────────────────────────────────────
+    // ── Boundary: features/** ───────────────────────────────────────────────
     {
       files: [`${src}/features/**/*.ts`],
       rules: {
         'no-restricted-imports': ['error', {
           patterns: [
             { group: ['@pages/*', '@widgets/*', '@app/*'],
-              message: 'features/ solo puede importar de @entities/* y @shared/*. NO puede importar de @app/* (bootstrap)' },
+              message: 'features/ may only import from @entities/* and @shared/*. It must NOT import from @app/* (bootstrap)' },
             ...DEEP_IMPORT_PATTERNS,
             ...CHART_ENGINE_PATTERNS,
             ...MAP_ENGINE_PATTERNS,
@@ -353,14 +354,14 @@ export function solerciaEslintConfig(options = {}) {
       },
     },
 
-    // ── Frontera: widgets/** ────────────────────────────────────────────────
+    // ── Boundary: widgets/** ────────────────────────────────────────────────
     {
       files: [`${src}/widgets/**/*.ts`],
       rules: {
         'no-restricted-imports': ['error', {
           patterns: [
             { group: ['@pages/*', '@app/*'],
-              message: 'widgets/ NO puede importar de @pages/* ni de @app/* (bootstrap)' },
+              message: 'widgets/ must NOT import from @pages/* or @app/* (bootstrap)' },
             ...DEEP_IMPORT_PATTERNS,
             ...CHART_ENGINE_PATTERNS,
             ...MAP_ENGINE_PATTERNS,
@@ -370,14 +371,14 @@ export function solerciaEslintConfig(options = {}) {
       },
     },
 
-    // ── Frontera: pages/** ──────────────────────────────────────────────────
+    // ── Boundary: pages/** ──────────────────────────────────────────────────
     {
       files: [`${src}/pages/**/*.ts`],
       rules: {
         'no-restricted-imports': ['error', {
           patterns: [
             { group: ['@app/*'],
-              message: 'pages/ NO puede importar de @app/* (bootstrap). Usa @widgets/@features/@entities/@shared.' },
+              message: 'pages/ must NOT import from @app/* (bootstrap). Use @widgets/@features/@entities/@shared.' },
             ...DEEP_IMPORT_PATTERNS,
             ...CHART_ENGINE_PATTERNS,
             ...MAP_ENGINE_PATTERNS,
@@ -387,9 +388,9 @@ export function solerciaEslintConfig(options = {}) {
       },
     },
 
-    // ── Frontera: app/** (capa raíz/bootstrap) ─────────────────────────────
-    // Puede importar de cualquier capa FSD, pero mantiene la convención de
-    // public API (no deep-import a slices internos).
+    // ── Boundary: app/** (root/bootstrap layer) ────────────────────────────
+    // It may import from any FSD layer, but keeps the public API convention
+    // (no deep imports into internal slices).
     {
       files: [`${src}/app/**/*.ts`],
       rules: {
@@ -399,5 +400,5 @@ export function solerciaEslintConfig(options = {}) {
   ];
 }
 
-/** Config lista para usar con `srcDir: 'src'` (default del ecosistema). */
+/** Ready-to-use config with `srcDir: 'src'` (the ecosystem default). */
 export default solerciaEslintConfig();

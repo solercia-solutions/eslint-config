@@ -2,7 +2,7 @@
   "name": "@solercia/eslint-config",
   "version": "0.2.0",
   "type": "module",
-  "description": "Preset ESLint compartible (flat config) del ecosistema Solercia: fronteras FSD, ubicación de archivos por capa y segmento, estilos con variables del tema (inline y .css), regla smart/dumb de shared/ui, restricción de Chart.js y convenciones de nombres.",
+  "description": "Shareable ESLint preset (flat config) of the Solercia ecosystem: FSD boundaries, file placement by layer and segment, theme-variable styles (inline and .css), the smart/dumb rule for shared/ui, Chart.js and MapLibre restrictions, and naming conventions.",
   "license": "Apache-2.0",
   "author": "Solercia Solutions SAS",
   "repository": {
@@ -20,7 +20,8 @@
     "LICENSE",
     "NOTICE",
     "README.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "llms.txt"
   ],
   "exports": {
     ".": "./index.js"
@@ -49,5 +50,14 @@
   },
   "engines": {
     "node": ">=22.14"
-  }
+  },
+  "keywords": [
+    "eslint",
+    "eslintconfig",
+    "angular",
+    "feature-sliced-design",
+    "fsd",
+    "design-tokens",
+    "css"
+  ]
 }

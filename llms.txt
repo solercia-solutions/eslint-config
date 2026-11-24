@@ -1,0 +1,35 @@
+# @solercia/eslint-config
+
+> Shareable ESLint 10 flat config for Angular projects that follow Feature-Sliced Design (FSD) and the @solercia/ui theme tokens. It fails lint when a file is in the wrong folder, an import crosses layers, or a style hardcodes a color, a font, !important or ::ng-deep.
+
+## Install
+
+- `npm install --save-dev @solercia/eslint-config eslint typescript-eslint @eslint/css`
+- `eslint.config.js`: `import solerciaConfig from '@solercia/eslint-config'; export default [...solerciaConfig];`
+- Factory with options: `import { solerciaEslintConfig } from '@solercia/eslint-config'` and `solerciaEslintConfig({ srcDir, extraSharedSegments, allowOutsideLayers })`.
+
+## Architecture enforced
+
+- Layers, top to bottom: app, pages, widgets, features, entities, shared. A layer imports only from layers below it. shared never imports from upper layers or @app/*.
+- Aliases are fixed: @app, @pages, @widgets, @features, @entities, @shared. Import slices only through their public API (index.ts): `@features/login`, never `@features/login/ui/form`.
+- File placement (`solercia/fsd-placement`): in pages, widgets, features and entities every file lives in `<slice>/<segment>/` with segment one of ui, model, api, lib, config, testing. Slice roots hold only index.ts, plus `<slice>.routes.ts` in pages. shared segments: api, config, crud, i18n, lib, model, tenant, tokens, ui (extendable with `extraSharedSegments`). Outside layers only main.ts, test-setup.ts, polyfills.ts and environments/**.
+- shared/ui is presentational: no imports from entities, features, *.store or *.facade.
+- chart.js only in shared/ui/chart (use <sol-chart>); maplibre-gl only in shared/ui/map (use <sol-map>); @angular/cdk only through sol-kanban-* components.
+- File names are kebab-case per dot segment (`solercia/filename-case`). Classes and types PascalCase; variables, functions and parameters camelCase.
+
+## Styles (`solercia/style-tokens`, `solercia/css-style-tokens`)
+
+- Use `var(--sol-*)` for colors and `var(--sol-font-family)` for fonts.
+- Literals are allowed only when defining a custom property (`--sol-x: #fff`) or as a var() fallback (`var(--sol-x, #fff)`).
+- Never `!important` or `::ng-deep`. Expose a CSS custom property instead.
+- Options per rule: `{ allowImportant?: boolean, allowNgDeep?: boolean }`, declared in the consumer config for specific files.
+
+## Rules for agents
+
+- Run `npx eslint <changed files>` before finishing.
+- Fix the code; do not add eslint-disable comments or loosen the config unless the user asks. Declared exceptions go in eslint.config.js with a reason.
+
+## Links
+
+- Repository: https://github.com/solercia-solutions/eslint-config
+- Component library: https://github.com/solercia-solutions/solercia-ui
