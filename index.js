@@ -3,8 +3,7 @@
  * @solercia/eslint-config — preset ESLint compartible (flat config, ESLint 10) del
  * ecosistema Solercia.
  *
- * Extraído de `boki-front/eslint.config.js` (openspec 07-e9-extraccion-solercia-ui,
- * PR2). Encapsula:
+ * Encapsula:
  *   1. Las fronteras FSD por capa (`no-restricted-imports`):
  *      app → pages → widgets → features → entities → shared
  *   2. La regla smart/dumb de `shared/ui`: prohíbe importar stores/facades/dominio
@@ -14,10 +13,12 @@
  *      (también sus `import()` dinámicos).
  *   4. Convenciones de nombres: `@typescript-eslint/naming-convention` (símbolos
  *      tipo/variable/función/parámetro) + `filename-case` propio (kebab-case).
+ *   5. Estilos con variables del tema y ubicación de archivos por capa y
+ *      segmento (`lib/rules.js`, desde 0.2.0).
  *
- * Uso (mientras el paquete no se publica — ver README.md de esta carpeta):
+ * Uso:
  *
- *   import solerciaConfig from './packages/eslint-config/index.js';
+ *   import solerciaConfig from '@solercia/eslint-config';
  *   export default [
  *     ...solerciaConfig,
  *     // reglas/overrides propios del proyecto consumidor
@@ -25,7 +26,7 @@
  *
  * Parametrizable si el proyecto consumidor no usa `src/` como raíz FSD:
  *
- *   import { solerciaEslintConfig } from './packages/eslint-config/index.js';
+ *   import { solerciaEslintConfig } from '@solercia/eslint-config';
  *   export default [...solerciaEslintConfig({ srcDir: 'apps/web/src' })];
  */
 import tseslint from 'typescript-eslint';
@@ -132,8 +133,7 @@ const MAP_ENGINE_PATTERNS = [
  * — ninguna vista/feature/entity/widget de un consumidor lo importa directo
  * (11-a-solercia-ui, PR5b/D1). El único lugar autorizado del ECOSISTEMA es el
  * árbol fuente de la propia librería (`projects/solercia/ui/src/lib/ui/kanban/`
- * en boki-front), que este preset compartido no cubre (fuera de `src/**`) — se
- * exime aparte en el `eslint.config.js` de boki-front.
+ * en el repositorio solercia-ui), que este preset no cubre (fuera de `src/**`).
  */
 const CDK_PATTERNS = [
   { group: ['@angular/cdk', '@angular/cdk/*'],

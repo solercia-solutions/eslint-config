@@ -1,9 +1,24 @@
 # @solercia/eslint-config
 
-Preset ESLint compartible (flat config, ESLint 10) del ecosistema Solercia. Extraído de
-`boki-front/eslint.config.js` (openspec `07-e9-extraccion-solercia-ui`, PR2) para que otros
-proyectos (empezando por `gestion_proyectos`) hereden las mismas reglas **por dependencia**,
-en vez de clonarlas.
+Preset ESLint compartible (flat config, ESLint 10) del ecosistema Solercia. Hace cumplir en los
+proyectos Angular consumidores la arquitectura FSD, la ubicación de los archivos y el uso de las
+variables del tema de [`@solercia/ui`](https://github.com/solercia-solutions/solercia-ui).
+
+```bash
+npm install -D @solercia/eslint-config eslint typescript-eslint @eslint/css
+```
+
+```js
+// eslint.config.js
+import solerciaConfig from "@solercia/eslint-config";
+
+export default [
+  { ignores: [".angular/", "dist/", "coverage/", "node_modules/"] },
+  ...solerciaConfig,
+];
+```
+
+`@eslint/css` es opcional: sin él, los `.css` no se revisan.
 
 ## Qué incluye
 
@@ -55,28 +70,18 @@ export default [
 Para un caso puntual (por ejemplo una hoja de impresión) basta un
 `/* eslint-disable-next-line solercia/style-tokens -- motivo */` con el motivo escrito.
 
-## Estado de distribución
+## Desarrollo y publicación
 
-Hoy es un paquete **preparado para publicar, aún sin publicar realmente** (metadata de
-publicación lista: licencia `Apache-2.0`, `NOTICE`, `publishConfig` hacia GitHub Packages,
-`npm publish --dry-run` verificado — ver `openspec/07-e9-extraccion-solercia-ui/tasks.md`,
-PR4). La publicación real está bloqueada por la decisión D1 del fundador (owner/organización
-del scope `@solercia`, repositorio de alojamiento y método de autenticación). Mientras tanto,
-`boki-front` NO declara `workspaces` en su `package.json` raíz, así que en vez de instalarlo
-como dependencia de npm, se referencia por **ruta relativa** desde `eslint.config.js`:
-
-```js
-import solerciaConfig from './packages/eslint-config/index.js';
-
-export default [
-  ...solerciaConfig,
-  // reglas/overrides propios del proyecto consumidor
-];
+```bash
+npm ci
+npm test   # pruebas del preset con node --test
 ```
 
-Cuando se publique en GitHub Packages (PR4 de `07-e9-extraccion-solercia-ui`), este paquete
-pasa a instalarse como cualquier devDependency y el import cambia a
-`import solerciaConfig from '@solercia/eslint-config';`.
+Para publicar: sube `version` en `package.json`, registra el cambio en `CHANGELOG.md` y empuja un
+tag `v<versión>`. El workflow `.github/workflows/publish.yml` verifica que el tag coincida con la
+versión y publica con Trusted Publishing de npm (OIDC, sin token). En npmjs.com el paquete debe
+tener como Trusted Publisher la organización `solercia-solutions`, el repositorio
+`eslint-config` y el workflow `publish.yml`.
 
 ## Parametrización
 
@@ -85,7 +90,7 @@ fija del ecosistema (`CONVENCIONES-FRONT-SOLERCIA.md`) y no se parametrizan. Lo 
 entre consumidores es la carpeta física raíz de FSD (`src/` por default):
 
 ```js
-import { solerciaEslintConfig } from './packages/eslint-config/index.js';
+import { solerciaEslintConfig } from '@solercia/eslint-config';
 
 export default [...solerciaEslintConfig({ srcDir: 'apps/web/src' })];
 ```

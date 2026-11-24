@@ -17,7 +17,7 @@ Todos los cambios notables de este paquete se documentan en este archivo. El for
 - Regla `solercia/fsd-placement`: cada archivo vive en una capa FSD y, dentro de un slice, en un
   segmento (`ui`, `model`, `api`, `lib`, `config`, `testing`). Opciones del preset
   `extraSharedSegments` y `allowOutsideLayers`.
-- Pruebas del preset con `node --test` (`npm run test:eslint-config` en boki-front).
+- Pruebas del preset con `node --test` (`npm test`).
 - Restricción de MapLibre GL con el mismo criterio que Chart.js: `maplibre-gl` solo se importa
   dentro de `shared/ui/map` (`sol-map`). Una regla `no-restricted-syntax` cubre además los
   `import()` dinámicos, que `no-restricted-imports` no ve.

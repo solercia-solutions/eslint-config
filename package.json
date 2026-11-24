@@ -7,8 +7,7 @@
   "author": "Solercia Solutions SAS",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/solercia-solutions/boki-front.git",
-    "directory": "packages/eslint-config"
+    "url": "git+https://github.com/solercia-solutions/eslint-config.git"
   },
   "publishConfig": {
     "access": "public",
@@ -35,5 +34,20 @@
     "@eslint/css": {
       "optional": true
     }
+  },
+  "homepage": "https://github.com/solercia-solutions/eslint-config#readme",
+  "bugs": {
+    "url": "https://github.com/solercia-solutions/eslint-config/issues"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "devDependencies": {
+    "@eslint/css": "2.0.1",
+    "eslint": "10.7.0",
+    "typescript-eslint": "8.63.0"
+  },
+  "engines": {
+    "node": ">=22.14"
   }
 }
