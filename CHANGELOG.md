@@ -4,6 +4,13 @@ All notable changes to this package are documented in this file. The format foll
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versioning follows
 [SemVer](https://semver.org/).
 
+## [0.2.1] - 2026-11-24
+
+### Added
+
+- `AGENTS.md` (with `CLAUDE.md` symlink) for AI coding agents: commands, conventions and the rule that
+  every commit on `main` is a tagged release. No changes to the published code.
+
 ## [0.2.0] - 2026-11-24
 
 ### Added
