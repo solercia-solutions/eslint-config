@@ -101,7 +101,7 @@ paint survives a missing theme:
 ```css
 :host {
   --sol-card-bg: #ffffff;                      /* defining a custom property */
-  background: var(--sol-surface, #ffffff);     /* fallback inside var() */
+  background: var(--sol-bg-surface, #ffffff);  /* fallback inside var() */
 }
 ```
 

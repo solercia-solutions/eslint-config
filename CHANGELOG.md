@@ -4,6 +4,12 @@ All notable changes to this package are documented in this file. The format foll
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versioning follows
 [SemVer](https://semver.org/).
 
+## [0.2.2] - 2026-11-26
+
+### Fixed
+
+- README example used `--sol-surface`, which does not exist; the token is `--sol-bg-surface`.
+
 ## [0.2.1] - 2026-11-24
 
 ### Added
